@@ -1,0 +1,7 @@
+name: memb_builder
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.* 
+  - biopython
+  - imbalanced-learn
