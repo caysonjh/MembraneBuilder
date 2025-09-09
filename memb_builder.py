@@ -4,6 +4,7 @@ import argparse
 from Bio import PDB 
 import numpy as np
 import string
+import time
 #from remove_incomplete_lipids import remove_incomplete_lipids
 
 def get_lipid_files(lipids):
@@ -47,7 +48,7 @@ def constrict_lipids(lipid_files, xy_scale=0.6, z_scale=1.2):
         with open(lipid, 'r') as f, open(constricted_file, 'w') as g:
             lines = f.readlines()
             for line in lines:
-                if line.startswith("ATOM"):
+                if line.startswith("ATOM") or line.startswith("HETATM"):
                     x = float(line[30:38])
                     y = float(line[38:46])
                     z = float(line[46:54])
@@ -166,6 +167,7 @@ def insert_lipids(lipid_files, box_size, lipid_ratios, protein_dims, outfile, z=
 
     # Create a list of lipids based on the ratios
     lipids = [lipid_files[i] for i in range(len(lipid_files)) for _ in range(int(lipid_ratios[lipid_files[i]]))]
+    #print(lipids)
     # Start at the bottom left corner of the box
     x, y = -box_size//2, -box_size//2
     first_leaflet = True
@@ -268,50 +270,50 @@ def insert_protein(protein_file, outfile, atom_number, res_number):
     return new_atom, new_res
 
 
-def main(argv):
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--proteins", help="protein input files", required=True, nargs='+') 
-    parser.add_argument("--lipids", nargs='+', help="lipid names", required=True)
-    parser.add_argument("--lipid_ratios", nargs='+', help="lipid ratios", required=True)
-    parser.add_argument("--output", help="output file", required=True)
-    parser.add_argument("--box_size", type=float, help="box size", required=True)
-    parser.add_argument("--z", type=float, help="z coordinate", default=0)
-    parser.add_argument("--buffer", type=float, help="buffer", default=2)
-    parser.add_argument("--z-buffer", type=float, help="z buffer", default = 0.1)
-    parser.add_argument("--xy_constrict", type=float, help='how much to constrict the xy directions of the lipids', default=0.7)
-    parser.add_argument("--z_constrict", type=float, help='how much to constrict the z direction of the lipids', default=1)
-    args = parser.parse_args()
+def run_builder(proteins, lipids, lipid_ratios, output, box_size, z=0, buffer=2, z_buffer=0.1, xy_constrict=0.7, z_constrict=1):
+    """ Run the builder
 
-    if len(args.lipids) != len(args.lipid_ratios):
+    Args:
+        proteins (_list_): List of protein files to insert
+        lipids (_list_): List of lipid files to insert
+        lipid_ratios (_list_): List of ratios of each lipid to insert
+        output (_str_): Output file to write the new system to
+        box_size (_float_): Size of the box to insert the lipids into
+        z (_float_): Z coordinate to insert lower leaflet at.
+        buffer (_float_): Buffer to put between lipids.
+        z_buffer (_float_): Buffer to put between the two leaflets.
+        xy_constrict (_float_): Value to scale x and y coordinates by.
+        z_constrict (_float_): Value to scale z coordinates by.
+    """
+
+    start_time = time.time()
+
+    if len(lipids) != len(lipid_ratios):
         print("Number of lipid ratios must match number of lipids")
         sys.exit(1)
 
-    with open(args.output, 'w') as f:
+    with open(output, 'w') as f:
         f.write("REMARK    THIS IS A SIMULATION BOX\n")
 
     os.system("rm -f gmx_output.log")
-    lipid_files = get_lipid_files(args.lipids)
-    constricted_lipid_files = constrict_lipids(lipid_files, xy_scale=args.xy_constrict, z_scale=args.z_constrict)
-    lipid_ratios = {constricted_lipid_files[i]: args.lipid_ratios[i] for i in range(len(constricted_lipid_files))}
-    print(f'Getting protein dimensions for {len(args.proteins)} proteins')
-    protein_dims = [{i: get_dims_at_z(protein, i) for i in range(int(-args.box_size//2), int(args.box_size//2), 2)} for protein in args.proteins]
+    lipid_files = get_lipid_files(lipids)
+    constricted_lipid_files = constrict_lipids(lipid_files, xy_scale=xy_constrict, z_scale=z_constrict)
+    lipid_ratios = {constricted_lipid_files[i]: lipid_ratios[i] for i in range(len(constricted_lipid_files))}
+    print(f'Getting protein dimensions for {len(proteins)} proteins')
+    protein_dims = [{i: get_dims_at_z(protein, i) for i in range(int(2*round(int(-box_size)/2)), int(2*round(int(box_size)+2/2)), 2)} for protein in proteins]
 
     print('Inserting proteins')
     atom_num, res_num = 1, 1
-    for protein in args.proteins:
-        atom_num, res_num = insert_protein(protein, args.output, atom_number=atom_num, res_number=res_num)
+    for protein in proteins:
+        atom_num, res_num = insert_protein(protein, output, atom_number=atom_num, res_number=res_num)
 
     print('Inserting lipids')
-    atom_num, res_num = insert_lipids(constricted_lipid_files, args.box_size, lipid_ratios, protein_dims, args.output, args.z, args.buffer, atom_num, res_num, args.z_buffer)
-    os.system('rm constricted_*.pdb')
+    atom_num, res_num = insert_lipids(constricted_lipid_files, box_size, lipid_ratios, protein_dims, output, z, buffer, atom_num, res_num, z_buffer)
     os.system(r'rm \#*')
 
-    #print("Running pdb cleaning...")
-    #remove_incomplete_lipids(args.output)
-
     print("Prepping for chimera-x")
-    os.system("gmx editconf -f " + args.output + " -o " + args.output + " >> gmx_output.log 2>&1")
-    os.system(f"sed -i '' '/OXT/d' {args.output}")
+    os.system("gmx editconf -f " + output + " -o " + output + " >> gmx_output.log 2>&1")
+    os.system(f"sed -i '' '/OXT/d' {output}")
+
+    print(f"Finished in {time.time() - start_time:.2f} seconds")
     
-if __name__ == "__main__":
-    main(sys.argv[1:])
