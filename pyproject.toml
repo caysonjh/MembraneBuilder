@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "MembraneBuilder"
+version = "0.1"
+authors = [{name = "Cayson Hamilton", email = "hamilton.cayson@gmail.com"}]
+description = "A library for embedding proteins in a membrane, especially for large systems."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["biopython", "numpy", "sys"]

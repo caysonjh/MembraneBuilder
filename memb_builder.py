@@ -1,11 +1,9 @@
 import sys
 import os
-import argparse
 from Bio import PDB 
 import numpy as np
 import string
 import time
-#from remove_incomplete_lipids import remove_incomplete_lipids
 
 def get_lipid_files(lipids):
     """ Get the lipid files from the current directory

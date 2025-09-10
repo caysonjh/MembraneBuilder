@@ -1,6 +1,5 @@
 import sys 
 
-
 def main(args):
     if len(args) < 2:
         print("Usage: {} <filename>".format(args[0]))

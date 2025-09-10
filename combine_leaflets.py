@@ -1,9 +1,7 @@
 import sys
-import os
 import argparse
-from Bio import PDB 
 import numpy as np
-import string
+
 
 class Lipid: 
     def __init__(self, name, id, max_z, min_z, lower_leaflet): 

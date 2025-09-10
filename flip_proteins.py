@@ -1,9 +1,4 @@
 import sys
-import os
-import argparse
-from Bio import PDB 
-import numpy as np
-import string
 
 pdb_file = sys.argv[1]
 
