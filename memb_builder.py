@@ -193,6 +193,8 @@ def insert_lipids(lipid_files, box_size, lipid_ratios, protein_dims, outfile, z=
                         # Check if the lipid is in the protein at the given z coordinate
                         for protein_dim in protein_dims:
                             lipid_height = lip_z 
+                            if int(2 * round(z/2)) not in protein_dim:
+                                continue
                             dim = protein_dim[int(2 * round(z/2))]
                             dim_top = protein_dim[int(2 * round((z + lipid_height/2)/2))]
                             dim_bottom = protein_dim[int(2 * round((z - lipid_height/2)/2))]
