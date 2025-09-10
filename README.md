@@ -1,4 +1,4 @@
-# memb_builder
+# MembraneBuilder
 Library for embedding proteins in a membrane, especially for large systems.
 
 ## Installation 
