@@ -272,7 +272,7 @@ def insert_protein(protein_file, outfile, atom_number, res_number):
     return new_atom, new_res
 
 
-def run_builder(proteins, lipids, lipid_ratios, output, box_size, z=0, buffer=2, z_buffer=0.1, xy_constrict=0.7, z_constrict=1):
+def run_builder(lipids, lipid_ratios, output, box_size, proteins=[], z=0, buffer=2, z_buffer=0.1, xy_constrict=0.7, z_constrict=1):
     """ Run the builder
 
     Args:
@@ -301,13 +301,16 @@ def run_builder(proteins, lipids, lipid_ratios, output, box_size, z=0, buffer=2,
     lipid_files = get_lipid_files(lipids)
     constricted_lipid_files = constrict_lipids(lipid_files, xy_scale=xy_constrict, z_scale=z_constrict)
     lipid_ratios = {constricted_lipid_files[i]: lipid_ratios[i] for i in range(len(constricted_lipid_files))}
-    print(f'Getting protein dimensions for {len(proteins)} proteins')
-    protein_dims = [{i: get_dims_at_z(protein, i) for i in range(int(2*round(int(-box_size)/2)), int(2*round(int(box_size)+2/2)), 2)} for protein in proteins]
+    if len(proteins) > 0:
+        print(f'Getting protein dimensions for {len(proteins)} proteins')
+        protein_dims = [{i: get_dims_at_z(protein, i) for i in range(int(2*round(int(-box_size)/2)), int(2*round(int(box_size)+2/2)), 2)} for protein in proteins]
 
-    print('Inserting proteins')
-    atom_num, res_num = 1, 1
-    for protein in proteins:
-        atom_num, res_num = insert_protein(protein, output, atom_number=atom_num, res_number=res_num)
+        print('Inserting proteins')
+        atom_num, res_num = 1, 1
+        for protein in proteins:
+            atom_num, res_num = insert_protein(protein, output, atom_number=atom_num, res_number=res_num)
+    else:
+        protein_dims = []
 
     print('Inserting lipids')
     atom_num, res_num = insert_lipids(constricted_lipid_files, box_size, lipid_ratios, protein_dims, output, z, buffer, atom_num, res_num, z_buffer)
