@@ -150,6 +150,6 @@ system. (C) Side view of system. \label{fig:figure3}](figures/memb_joss.png)
 
 # Dependencies
 
-The program is available as a python package [@MembraneBuilder2025].
+The program is available as a python package [@MembraneBuilder].
 GROMACS [@Abraham:2015] must be installed and accessible to your system
 via the command line `gmx`.
