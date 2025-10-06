@@ -1,5 +1,5 @@
 ---
-title: 'MembraneBuilder: High-speed membrane construction for large molecular dynamics simulations'
+title: 'MembraneBuilder: High-speed Membrane Construction for Large Molecular Dynamics Simulations'
 tags: 
   - Python 
   - Molecular Dynamics
