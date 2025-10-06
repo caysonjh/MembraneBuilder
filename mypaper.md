@@ -1,17 +1,43 @@
+---
+title: 'MembraneBuilder: High-speed membrane construction for large molecular dynamics simulations'
+tags: 
+  - Python 
+  - Molecular Dynamics
+  - GROMACS
+  - protein embedding
+  - computational biology
+  - simulations
+  - protein modeling
+  - lipid insertion
+  - molecular modeling
+authors: 
+  - name: Cayson J. Hamilton
+    orcid: 0009-0009-2254-6841
+    affiliation: 1
+  - name: Gus L. W. Hart
+    orcid: 0000-0002-6149-9234
+    affiliation: 1
+affiliations: 
+  - name: Brigham Young University, United States
+    index: 1
+date: 6 October 2025
+bibliography: paper.bib
+---
+
 # Summary
 
 Membrane building and embedding of proteins into a membrane is a crucial
 step in preparing a simulation for Molecular Dynamics (MD). When an MD
 simulation contains several million atoms, embedding the protein into a
 membrane becomes computationally expensive. `MembraneBuilder`
-[@MembraneBuilder2025] speeds up the generation of these membranes by
+[@MembraneBuilder] speeds up the generation of these membranes by
 simplifying the lipid insertion process, which allows membranes to be
 generated for these larger systems. Realistic lipid densities and
 elimination of infinite forces caused by overlapping atoms are achieved
-at a low computational cost. See [Figure 1](#figure1) for specific time
+at a low computational cost. See \autoref{fig:figure1} for specific time
 comparisons. The comparisons emphasize that not only does
 `MembraneBuilder` run orders of magnitude faster than state-of-the-art
-programs [@jo2008charmmgui; @jo2009charmmguimembrane; @wu2014charmmgui],
+programs [@Jo:2008; @Jo:2009; @Wu:2014],
 it enables generation of systems several orders of magnitude larger.
 
 `MembraneBuilder` enables customizable embedding of proteins into a
@@ -33,7 +59,7 @@ during energy minimization and equilibration.
 MembraneBuilder and CHARMM-GUI with varying protein sizes and their
 requisite amount of lipids. Note that the $x$ and $y$ scales are on a
 log scale, which further emphasizes the efficiency of
-MembraneBuilder.](figures/speed_analysis.png){#figure1}
+MembraneBuilder. \label{fig:figure1}](figures/speed_analysis.png)
 
 # Statement of Need
 
@@ -54,7 +80,7 @@ user interface crashes, or lack of sufficient computational resources.
 Even if membrane generation is successful, it may take days to weeks to
 complete and may contain steric clashes making MD impossible. In most
 cases, large systems cannot even be processed. CHARMM-GUI
-[@jo2008charmmgui; @jo2009charmmguimembrane; @wu2014charmmgui], the most
+[@Jo:2008; @Jo:2009; @Wu:2014], the most
 common membrane builder, can only process files smaller than 100 MB or
 containing less than 3 million atoms [@CHARMMGUI_QA_2025]. Most
 importantly, `MembraneBuilder` can process large systems efficiently
@@ -62,7 +88,7 @@ while avoiding steric clashes. Beyond that, `MembraneBuilder` provides
 options to customize lipid ratios, densities, and location. We have
 built a membrane system with 14 million atoms and the simulations of the
 system run without error.
-[@Dutka_Liu_Maggi_Ghosal_Wang_Carter_Zhao_Vijayrajratnam_Vogel_Jensen_2023].
+[@Dutka:2023].
 
 # Methodology
 
@@ -72,13 +98,13 @@ allowing insertion of more lipids in the same space with no overlapping
 atoms (avoiding steric clashes). The lipids are constricted by two
 user-defined factors, one for compression in the $x$-$y$ plane and
 another in $z$ direction. An example constriction is shown for the POPE
-lipid in [Figure 1](#figure1). [Panel B](#figure1) shows that the lipid
+lipid in \autoref{fig:figure2}. \autoref{fig:figure2} shows that the lipid
 has the same topology, just constrained to a smaller volume, allowing
 for tighter packing.
 
 ![**Lipid Constriction:** (A) POPE in the unconstricted configuration.
 (B) POPE constricted by 0.55 in the $x$-$y$ directions and stretched by
-1.1 in the $z$ direction.](figures/lipidcont.png){#figure2}
+1.1 in the $z$ direction. \label{fig:figure2}](figures/lipidcont.png)
 
 In addition to lipid-lipid steric clashes, the algorithm avoids
 lipid-protein clashes with the membrane protein. The first step is
@@ -111,19 +137,19 @@ not inserted, and insertion moves to the next position. This process
 greatly reduces likelihood of steric clashes in the generated membrane
 configuration, and performs the insertion in a very timely manner.
 
-An example insertion can be seen in [Figure 2](#figure2), which was used
+An example insertion can be seen in \autoref{fig:figure3}, which was used
 in research performed on the *Legionella pneumophila* Type IV Secretion
 System (T4SS)
-[@Dutka_Liu_Maggi_Ghosal_Wang_Carter_Zhao_Vijayrajratnam_Vogel_Jensen_2023].
+[@Dutka:2023].
 The lattice pattern is clearly visible, an effect which disappears once
 energy minimization and equilibration have been run and the system moves
 towards its natural configuration.
 
 ![**Membrane System:** (A) Angled view of system. (B) Bottom up view of
-system. (C) Side view of system.](figures/memb_joss.png){#figure3}
+system. (C) Side view of system. \label{fig:figure3}](figures/memb_joss.png)
 
 # Dependencies
 
 The program is available as a python package [@MembraneBuilder2025].
-GROMACS [@Abraham2015] must be installed and accessible to your system
+GROMACS [@Abraham:2015] must be installed and accessible to your system
 via the command line `gmx`.
